@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Drawing;
+using System.Linq;
 using System.Xml.Linq;
 
 namespace LinqBeginProject
@@ -21,12 +22,26 @@ namespace LinqBeginProject
     }
 
 
-    class User
+    record User
     {
+        public int Id { set; get; } = 0;
         public string? Name { get; set; }
         public int Age { set; get; }
         public List<string>? Skils { set; get; }
+        //public int SkillId { set; get; }
 
+    }
+
+    class Skill
+    {
+        public int Id { set; get; }
+        public string? Title { get; set; }
+    }
+
+    struct UserSkill
+    {
+        public int UserId { set; get; }
+        public int SkillId { set; get; }
     }
 
     class UserNameLengthComparer : IComparer<string>
@@ -93,130 +108,48 @@ namespace LinqBeginProject
         static void Main(string[] args)
         {
             //LinqBegin.Run();
-            List<Employe> employes = new()
+
+            
+
+            List<User> users = new List<User>()
             {
-                new() { Name = "Bob", Company = "Yandex" },
-                new() { Name = "Joe", Company = "Mail Group" },
-                new() { Name = "Tim", Company = "Ozon" },
-                new() { Name = "Sam", Company = "Yandex" },
-                new() { Name = "Ben", Company = "Ozon" },
-                new() { Name = "Tom", Company = "Mail Group" },
-                new() { Name = "Jim", Company = "Yandex" },
-                new() { Name = "Leo", Company = "Mail Group" },
-                new() { Name = "Ann", Company = "Ozon" },
-                new() { Name = "Kim", Company = "Yandex" },
+                new User(){ Name = "Bob", Age = 37, Skils = new(){ "C++", "JS", "HTML" } },
+                new User(){ Name = "Joe", Age = 22, Skils = new(){ "C#", "Java", "HTML", "CSS" } },
+                new User(){ Name = "Sam", Age = 41, Skils = new(){ "C++", "C#", "Java" } },
+                new User(){ Name = "Tommy", Age = 32, Skils = new(){ "JS", "HTML", "CSS" } },
+                new User(){ Name = "Jim", Age = 19, Skils = new(){ "C#", "Java", "CSS" } },
+                new User(){ Name = "Mike", Age = 27, Skils = new(){ "C++", "C#" } },
+                new User(){ Name = "Billy", Age = 43, Skils = new(){ "HTML", "CSS" } },
+                new User(){ Name = "Walter", Age = 36, Skils = new(){ "C++", "JS", "HTML" } },
             };
 
+            //bool flag = users.All(u => u.Age > 20);
+            //Console.WriteLine($"{flag}");
 
-            // linq operations
-            var usersGroupOne = from e in employes
-                                group e by e.Company;
+            //bool flag2 = users.Any(u => u.Age == 43);
+            //Console.WriteLine($"{flag2}");
 
-            //Console.WriteLine(usersGroupOne.GetType());
-            foreach(var comp in usersGroupOne)
-            {
-                Console.WriteLine($"Company: {comp.Key}");
-                foreach (var e in comp)
-                    Console.WriteLine($"\t{e.Name}");
-            }
-            Console.WriteLine(new String('-', 20));
+            //bool flag3 = users.Contains(new User() { Name = "Walter", Age = 36, Skils = new() { "C++", "JS", "HTML" } });
+            //Console.WriteLine($"{flag3}");
 
-            // linq methods
-            var usersGroupTwo = employes.GroupBy(e => e.Company);
+            //string[] arrStr = { "aaa", "bbb", "ccc" };
+            //Console.WriteLine($"{arrStr.Contains("ddd")}");
 
-            foreach (var comp in usersGroupTwo)
-            {
-                Console.WriteLine($"Company: {comp.Key}");
-                foreach (var e in comp)
-                    Console.WriteLine($"\t{e.Name}");
-            }
-            Console.WriteLine(new String('-', 20));
+            int age = 22;
 
+            var user22 = from u in users
+                         where u.Age >= age
+                         select u;
 
-            // linq operations
-            var usersGroupNewOne = from e in employes
-                                   group e by e.Company into temp
-                                   select new
-                                   {
-                                       Company = temp.Key,
-                                       Count = temp.Count()
-                                   };
+            //age = 27;
 
-            //Console.WriteLine(usersGroupOne.GetType());
-            foreach (var comp in usersGroupNewOne)
-            {
-                Console.WriteLine($"Company: {comp.Company} - {comp.Count}");
-                
-            }
-            Console.WriteLine(new String('-', 20));
+            //foreach(var u in user22)
+            //    Console.WriteLine($"{u.Name} - {u.Age}");
+            //Console.WriteLine();
+            //age = 35;
 
-            // linq methods
-            var usersGroupNewTwo = employes.GroupBy(e => e.Company)
-                                           .Select(temp => new
-                                           {
-                                               Company = temp.Key,
-                                               Count = temp.Count()
-                                           });
-
-            foreach (var comp in usersGroupNewTwo)
-            {
-                Console.WriteLine($"Company: {comp.Company} - {comp.Count}");
-            }
-            Console.WriteLine(new String('-', 20));
-
-
-            // linq operations
-            var usersGroupColOne = from e in employes
-                                   group e by e.Company into temp
-                                   select new
-                                   {
-                                       Company = temp.Key,
-                                       Count = temp.Count(),
-                                       Employes = from t in temp select t
-                                   };
-
-            //Console.WriteLine(usersGroupOne.GetType());
-            foreach (var comp in usersGroupColOne)
-            {
-                Console.WriteLine($"Company: {comp.Company} - {comp.Count}");
-                foreach(var e in comp.Employes)
-                    Console.WriteLine($"\t{e.Name}");
-            }
-            Console.WriteLine(new String('-', 20));
-
-            // linq methods
-            var usersGroupColTwo = employes.GroupBy(e => e.Company)
-                                           .Select(temp => new
-                                           {
-                                               Company = temp.Key,
-                                               Count = temp.Count(),
-                                               Employes = temp.Select(e => e)
-                                           });
-
-            //foreach (var comp in usersGroupColTwo)
-            //{
-            //    Console.WriteLine($"Company: {comp.Company} - {comp.Count}");
-            //    foreach (var e in comp.Employes)
-            //        Console.WriteLine($"\t{e.Name}");
-            //}
-            Console.WriteLine(new String('-', 20));
-
-
-            string compn = "Yandex";
-            var eComp = from e in employes
-                            where e.Company == compn
-                            select e;
-
-
-            compn = "Ozon";
-            foreach (var e in eComp)
-                Console.WriteLine($"{e.Name} {e.Company}");
-            Console.WriteLine(new String('-', 20));
-
-            compn = "Yandex";
-            foreach (var e in eComp)
-                Console.WriteLine($"{e.Name} {e.Company}");
-            Console.WriteLine(new String('-', 20));
+            //foreach (var u in user22)
+            //    Console.WriteLine($"{u.Name} - {u.Age}");
         }
     }
 }
